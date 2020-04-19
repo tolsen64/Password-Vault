@@ -59,6 +59,7 @@ namespace BoycoT_Password_Vault
                         ExportToCSV();
                         break;
                     case ABOUT_THIS_PROGRAM:
+                        System.Diagnostics.Process.Start("https://github.com/tolsen64/Password-Vault");
                         break;
                 }
             }
