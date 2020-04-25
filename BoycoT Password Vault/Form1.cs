@@ -308,7 +308,9 @@ You should move the file to a secure location.");
                 }
                 else if (dataGridView1.Columns[e.ColumnIndex] is DataGridViewLinkColumn)
                 {
-                    Process.Start(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().DecryptBase64StringToText().ToUnsecureString());
+                    string url = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().DecryptBase64StringToText().ToUnsecureString();
+                    if (!url.StartsWith("http://") & !url.StartsWith("https://") && !url.StartsWith("www.")) url = $"www.{url}";
+                    Process.Start(url);
                 }
             }
         }

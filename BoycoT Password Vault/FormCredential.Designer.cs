@@ -72,21 +72,21 @@
             this.txtCredName.Location = new System.Drawing.Point(106, 6);
             this.txtCredName.Name = "txtCredName";
             this.txtCredName.Size = new System.Drawing.Size(287, 20);
-            this.txtCredName.TabIndex = 3;
+            this.txtCredName.TabIndex = 1;
             // 
             // txtUserID
             // 
             this.txtUserID.Location = new System.Drawing.Point(106, 32);
             this.txtUserID.Name = "txtUserID";
             this.txtUserID.Size = new System.Drawing.Size(287, 20);
-            this.txtUserID.TabIndex = 4;
+            this.txtUserID.TabIndex = 2;
             // 
             // txtPassword
             // 
             this.txtPassword.Location = new System.Drawing.Point(106, 58);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(287, 20);
-            this.txtPassword.TabIndex = 5;
+            this.txtPassword.TabIndex = 3;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // btnOK
@@ -95,7 +95,7 @@
             this.btnOK.Location = new System.Drawing.Point(239, 110);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 6;
+            this.btnOK.TabIndex = 5;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
@@ -106,7 +106,7 @@
             this.btnCancel.Location = new System.Drawing.Point(320, 110);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 7;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
@@ -115,7 +115,7 @@
             this.txtLink.Location = new System.Drawing.Point(106, 84);
             this.txtLink.Name = "txtLink";
             this.txtLink.Size = new System.Drawing.Size(287, 20);
-            this.txtLink.TabIndex = 8;
+            this.txtLink.TabIndex = 4;
             // 
             // label4
             // 
