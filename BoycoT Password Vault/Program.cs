@@ -15,6 +15,7 @@ namespace BoycoT_Password_Vault
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
             using (LoginForm form = new LoginForm())
             {
                 form.Text = "Enter or Create Credentials";
@@ -32,12 +33,14 @@ namespace BoycoT_Password_Vault
                     }
                     else
                     {
-                        settings = new SettingsRoot();
-                        settings.appUserID = form.id.ToHash().ToUnsecureString();
-                        settings.appPassword = form.pwd.ToHash().ToUnsecureString();
-                        settings.appTimeout = 1.00M;
-                        settings.dbServer = "database.json".ToSecureString().EncryptTextToBase64String();
-                        settings.dbType = 0;
+                        settings = new SettingsRoot
+                        {
+                            appUserID = form.id.ToHash().ToUnsecureString(),
+                            appPassword = form.pwd.ToHash().ToUnsecureString(),
+                            appTimeout = 1.00M,
+                            dbServer = "database.json".ToSecureString().EncryptTextToBase64String(),
+                            dbType = 0
+                        };
                         SaveSettings();
                         MessageBox.Show("The Vault has been initialized. You can go into the settings by clicking on the program's icon in the upper-left corner of the window.");
                         Application.Run(new Form1());

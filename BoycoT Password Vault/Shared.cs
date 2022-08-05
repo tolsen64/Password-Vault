@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using static BoycoT_Password_Vault.Settings;
+﻿using static BoycoT_Password_Vault.Settings;
 
 namespace BoycoT_Password_Vault
 {
@@ -39,8 +33,6 @@ namespace BoycoT_Password_Vault
                     db.ConnectionString = settings.dbServer;
                     break;
             }
-            db.CreateTable();
-
             return db;
         }
     }

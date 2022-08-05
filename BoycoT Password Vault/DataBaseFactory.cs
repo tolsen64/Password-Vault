@@ -219,6 +219,7 @@ namespace BoycoT_Password_Vault
         private string _connStr;
         internal override string ConnectionString
         {
+            //get => "server=192.168.1.202;database=tolsen64;uid=tolsen64;pwd=abcDEF123$%^";
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
             set => _connStr = value;
         }

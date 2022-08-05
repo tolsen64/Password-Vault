@@ -1,12 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security;
 using System.Windows.Forms;
-using static RijndaelAES;
 
 namespace BoycoT_Password_Vault
 {
@@ -49,9 +44,16 @@ namespace BoycoT_Password_Vault
             settings = JsonConvert.DeserializeObject<SettingsRoot>(File.ReadAllText(Shared.SettingsFile));
             AbstractDatabase db = Shared.GetDatabase();
             if (db.ConnectionString != "" && db.TestConnection())
+            {
+                db.CreateTable();
                 dtCredentials = db.GetPasswords();
-            foreach (DataRow dr in dtCredentials.Rows)
-                dr["CredentialName"] = dr["CredentialName"].ToString().DecryptBase64StringToText().ToUnsecureString();
+                foreach (DataRow dr in dtCredentials.Rows)
+                    dr["CredentialName"] = dr["CredentialName"].ToString().DecryptBase64StringToText().ToUnsecureString();
+            }
+            else
+            {
+                MessageBox.Show("You will need to go into the \"Password Manager Settings\" and reconfigure the database parameters.");
+            }
 
             return true;
         }
