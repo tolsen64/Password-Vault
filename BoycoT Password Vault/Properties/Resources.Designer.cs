@@ -93,6 +93,16 @@ namespace BoycoT_Password_Vault.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap security_icon {
+            get {
+                object obj = ResourceManager.GetObject("security-icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ui_text_field_password_green_icon {
             get {
                 object obj = ResourceManager.GetObject("ui_text_field_password_green_icon", resourceCulture);

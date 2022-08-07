@@ -193,7 +193,7 @@ static class RijndaelAES
         catch (Exception)
         {
             string msg = "Unable to decrypt";
-            MessageBox.Show("Unable to decrypt.");
+            //MessageBox.Show("Unable to decrypt.");
             SecureString s = new SecureString();
             foreach (char c in msg)
                 s.AppendChar(c);

@@ -135,12 +135,14 @@ namespace BoycoT_Password_Vault
                         string colUserID = row.Cells["colUserID"].Value.ToString();
                         string colPassword = row.Cells["colPassword"].Value.ToString();
                         string colLink = row.Cells["colLink"].Value.ToString();
+                        string colRecoveryKey = row.Cells["colRecoveryKey"].Value.ToString();
 
                         if (colUserID.Length > 0) colUserID = colUserID.DecryptBase64StringToText().ToUnsecureString();
                         if (colPassword.Length > 0) colPassword = colPassword.DecryptBase64StringToText().ToUnsecureString();
                         if (colLink.Length > 0) colLink = colLink.DecryptBase64StringToText().ToUnsecureString();
+                        if (colRecoveryKey.Length > 0) colRecoveryKey = colRecoveryKey.DecryptBase64StringToText().ToUnsecureString();
 
-                        sw.WriteLine($@"""{colID}"",""{colName.Replace("\"", "\"\"")}"",""{colUserID.Replace("\"", "\"\"")}"",""{colPassword.Replace("\"", "\"\"")}"",""{colLink.Replace("\"", "\"\"")}""");
+                        sw.WriteLine($@"""{colID}"",""{colName.Replace("\"", "\"\"")}"",""{colUserID.Replace("\"", "\"\"")}"",""{colPassword.Replace("\"", "\"\"")}"",""{colLink.Replace("\"", "\"\"")}"",""{colRecoveryKey.Replace("\"", "\"\"")}""");
                     }
                 }
                 MessageBox.Show($@"Passwords have been exported to:
@@ -162,10 +164,11 @@ You should move the file to a secure location.");
                 string colUserID = row.Cells["colUserID"].Value.ToString();
                 string colPassword = row.Cells["colPassword"].Value.ToString();
                 string colLink = row.Cells["colLink"].Value.ToString();
+                string colRecoveryKey = row.Cells["colLink"].Value.ToString();
 
                 if (colName.Length > 0) colName = colName.ToSecureString().EncryptTextToBase64String();
 
-                dtCredentials = Shared.GetDatabase().MergePassword(colID, colName, colUserID, colPassword, colLink);
+                dtCredentials = Shared.GetDatabase().MergePassword(colID, colName, colUserID, colPassword, colLink, colRecoveryKey);
             }
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = dtCredentials.DefaultView;
@@ -184,7 +187,8 @@ You should move the file to a secure location.");
                     string UserID = form.UserID.EncryptTextToBase64String();
                     string Password = form.Password.EncryptTextToBase64String();
                     string Link = form.Link.EncryptTextToBase64String();
-                    DataTable dt = Shared.GetDatabase().MergePassword(NewID, CredentialName, UserID, Password, Link);
+                    string RecoveryKey = form.RecoveryKey.EncryptTextToBase64String();
+                    DataTable dt = Shared.GetDatabase().MergePassword(NewID, CredentialName, UserID, Password, Link, RecoveryKey);
                     if (dtCredentials.Columns.Count == 0)
                     {
                         dataGridView1.DataSource = null;
@@ -194,7 +198,7 @@ You should move the file to a secure location.");
                     }
                     else
                     {
-                        dtCredentials.Rows.Add(new object[] { NewID, form.CredentialName.ToUnsecureString(), UserID, Password, Link });
+                        dtCredentials.Rows.Add(new object[] { NewID, form.CredentialName.ToUnsecureString(), UserID, Password, Link, RecoveryKey });
                         dtCredentials.AcceptChanges();
                     }
                 }
@@ -237,6 +241,8 @@ You should move the file to a secure location.");
                         form.Password = row.Cells["colPassword"].Value.ToString().DecryptBase64StringToText();
                         if (row.Cells["colLink"].Value != null)
                             form.Link = row.Cells["colLink"].Value.ToString().DecryptBase64StringToText();
+                        if (row.Cells["colRecoveryKey"].Value != null)
+                            form.RecoveryKey = row.Cells["colRecoveryKey"].Value.ToString().DecryptBase64StringToText();
 
                         if (form.ShowDialog(this) == DialogResult.OK)
                         {
@@ -245,12 +251,14 @@ You should move the file to a secure location.");
                             string UserID = form.UserID.EncryptTextToBase64String();
                             string Password = form.Password.EncryptTextToBase64String();
                             string Link = form.Link.EncryptTextToBase64String();
-                            Shared.GetDatabase().MergePassword(ID, CredentialName, UserID, Password, Link);
+                            string RecoveryKey = form.RecoveryKey.EncryptTextToBase64String();
+                            Shared.GetDatabase().MergePassword(ID, CredentialName, UserID, Password, Link, RecoveryKey);
                             DataRow dr = dtCredentials.AsEnumerable().First(r => int.Parse(r["ID"].ToString()) == ID);
                             dr["CredentialName"] = CredentialName.DecryptBase64StringToText().ToUnsecureString();
                             dr["UserID"] = UserID;
                             dr["Password"] = Password;
                             dr["Link"] = Link;
+                            dr["RecoveryKey"] = RecoveryKey;
                             dtCredentials.AcceptChanges();
                         }
                     }
@@ -278,6 +286,9 @@ You should move the file to a secure location.");
                     if (e.Value != DBNull.Value && e.Value != null && (string)e.Value != "")
                         e.Value = btnShowLink.Checked ? e.Value.ToString().DecryptBase64StringToText().ToUnsecureString() : "Open Link";
                     break;
+                case "colRecoveryKey":
+                    e.Value = btnShowRecoveryKey.Checked ? e.Value.ToString().DecryptBase64StringToText().ToUnsecureString() : "Copy Recovery Key";
+                    break;
             }
         }
 
@@ -293,6 +304,9 @@ You should move the file to a secure location.");
                     break;
                 case "colLink":
                     e.ToolTipText = "Open Link in default browser";
+                    break;
+                case "colRecoveryKey":
+                    e.ToolTipText = "Copy Recovery Key to Clipboard";
                     break;
             }
         }

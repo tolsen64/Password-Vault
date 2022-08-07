@@ -20,6 +20,12 @@ namespace BoycoT_Password_Vault
         internal SecureString UserID { get; set; }
         internal SecureString Password { get; set; }
         internal SecureString Link { get; set; }
+        internal SecureString RecoveryKey { get; set; }
+        internal bool UpperCase { get; set; }
+        internal bool LowerCase { get; set; }
+        internal bool Numbers { get; set; }
+        internal bool Symbols { get; set; }
+        internal int PwdLength { get; set; }    
 
         public FormCredential()
         {
@@ -32,6 +38,12 @@ namespace BoycoT_Password_Vault
             txtUserID.Text = UserID.ToUnsecureString();
             txtPassword.Text = Password.ToUnsecureString();
             txtLink.Text = Link.ToUnsecureString();
+            txtRecoveryKey.Text = RecoveryKey.ToUnsecureString();
+            chkLowerCase.Checked = LowerCase;
+            chkUpperCase.Checked = UpperCase;
+            chkNumbers.Checked = Numbers;
+            chkSymbols.Checked = Symbols;
+            numPwdLength.Value= PwdLength;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -40,6 +52,22 @@ namespace BoycoT_Password_Vault
             UserID = txtUserID.Text.ToSecureString();
             Password = txtPassword.Text.ToSecureString();
             Link = txtLink.Text.ToSecureString();
+            RecoveryKey = txtRecoveryKey.Text.ToSecureString();
+            LowerCase = chkLowerCase.Checked;
+            UpperCase = chkUpperCase.Checked;
+            Numbers = chkNumbers.Checked;
+            Symbols = chkSymbols.Checked;
+            PwdLength = (int)numPwdLength.Value;
+        }
+
+        private void btnCreatePassword_Click(object sender, EventArgs e)
+        {
+            LowerCase = chkLowerCase.Checked;
+            UpperCase = chkUpperCase.Checked;
+            Numbers = chkNumbers.Checked;   
+            Symbols = chkSymbols.Checked;
+            PwdLength = (int)numPwdLength.Value;
+            txtPassword.Text = PasswordGenerator.CreatePassword(PwdLength, Symbols, Numbers, UpperCase, LowerCase);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace BoycoT_Password_Vault
         internal abstract void CreateTable();
         internal abstract DataTable GetPasswords();
         internal abstract DataTable DeletePassword(int ID);
-        internal abstract DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link);
+        internal abstract DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey);
     }
 
     internal class JsonDatabase : AbstractDatabase
@@ -68,7 +68,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link)
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = GetPasswords();
             if (dt.Columns.Count == 0)
@@ -78,6 +78,7 @@ namespace BoycoT_Password_Vault
                 dt.Columns.Add("UserID", typeof(string));
                 dt.Columns.Add("Password", typeof(string));
                 dt.Columns.Add("Link", typeof(string));
+                dt.Columns.Add("RecoveryKey", typeof(string));
             }
             if (dt.Rows.Count > 0 && dt.AsEnumerable().Any(row => int.Parse(row["ID"].ToString()) == ID))
             {
@@ -86,6 +87,7 @@ namespace BoycoT_Password_Vault
                 row["UserID"] = UserID;
                 row["Password"] = Password;
                 row["Link"] = Link;
+                row["RecoveryKey"] = RecoveryKey;
             }
             else
             {
@@ -95,6 +97,7 @@ namespace BoycoT_Password_Vault
                 row["UserID"] = UserID;
                 row["Password"] = Password;
                 row["Link"] = Link;
+                row["RecoveryKey"] = RecoveryKey;
                 dt.Rows.Add(row);
             }
             dt.AcceptChanges();
@@ -134,7 +137,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand("", conn))
                 {
-                    cmd.CommandText = $"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault' AND xtype='U') CREATE TABLE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512));";
+                    cmd.CommandText = $"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault' AND xtype='U') CREATE TABLE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -148,14 +151,14 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand("", conn))
                 {
-                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     dt.Load(cmd.ExecuteReader());
                 }
             }
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link)
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnectionString))
@@ -164,16 +167,17 @@ namespace BoycoT_Password_Vault
                 using (SqlCommand cmd = new SqlCommand("", conn))
                 {
                     cmd.CommandText = $"MERGE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault T " +
-                                      "USING (SELECT @ID ID, @CredentialName CredentialName, @UserID UserID, @Password Password, @Link Link) S " +
+                                      "USING (SELECT @ID ID, @CredentialName CredentialName, @UserID UserID, @Password Password, @Link Link, @RecoveryKey RecoveryKey) S " +
                                       "ON T.ID = S.ID " +
-                                      "WHEN MATCHED THEN UPDATE SET T.CredentialName = S.CredentialName, T.UserID = S.UserID, T.Password = S.Password, T.Link = S.Link " +
-                                      "WHEN NOT MATCHED THEN INSERT (ID, CredentialName, UserID, Password, Link) VALUES (ID, CredentialName, UserID, Password, Link); " +
-                                      $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                                      "WHEN MATCHED THEN UPDATE SET T.CredentialName = S.CredentialName, T.UserID = S.UserID, T.Password = S.Password, T.Link = S.Link, T.RecoveryKey = S.RecoveryKey " +
+                                      "WHEN NOT MATCHED THEN INSERT (ID, CredentialName, UserID, Password, Link, RecoveryKey) VALUES (ID, CredentialName, UserID, Password, Link, RecoveryKey); " +
+                                      $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
                     cmd.Parameters.Add("@CredentialName", SqlDbType.VarChar, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", SqlDbType.VarChar, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", SqlDbType.VarChar, 512).Value = Password;
                     cmd.Parameters.Add("@Link", SqlDbType.VarChar, 512).Value = Link == null || Link == "" ? "" : Link;
+                    cmd.Parameters.Add("@RecoveryKey", SqlDbType.VarChar, 512).Value = RecoveryKey == null || RecoveryKey == "" ? "" : RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
             }
@@ -231,7 +235,20 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("", conn))
                 {
-                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512));";
+                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = $@"
+CREATE PROCEDURE temp_add_column()
+BEGIN
+IF (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME='RecoveryKey' AND TABLE_NAME='T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault') = 0 THEN
+	ALTER TABLE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ADD RecoveryKey varchar(512);
+END IF;
+END;
+CALL temp_add_column();
+DROP PROCEDURE temp_add_column;
+";
+                    Debug.WriteLine(cmd.CommandText);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -245,14 +262,14 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("", conn))
                 {
-                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     dt.Load(cmd.ExecuteReader());
                 }
             }
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link)
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (MySqlConnection conn = new MySqlConnection(ConnectionString))
@@ -260,15 +277,16 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("", conn))
                 {
-                    cmd.CommandText = $"INSERT INTO T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID, CredentialName, UserID, Password, Link) " +
-                                      "VALUES (@ID, @CredentialName, @UserID, @Password, @Link) " +
-                                      "ON DUPLICATE KEY UPDATE CredentialName = @CredentialName, UserID = @UserID, Password = @Password, Link = @Link; " +
-                                      $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"INSERT INTO T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID, CredentialName, UserID, Password, Link, RecoveryKey) " +
+                                      "VALUES (@ID, @CredentialName, @UserID, @Password, @Link, @RecoveryKey) " +
+                                      "ON DUPLICATE KEY UPDATE CredentialName = @CredentialName, UserID = @UserID, Password = @Password, Link = @Link, RecoveryKey = @RecoveryKey; " +
+                                      $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", MySqlDbType.Int32).Value = ID;
                     cmd.Parameters.Add("@CredentialName", MySqlDbType.VarChar, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", MySqlDbType.VarChar, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", MySqlDbType.VarChar, 512).Value = Password;
                     cmd.Parameters.Add("@Link", MySqlDbType.VarChar, 512).Value = Link;
+                    cmd.Parameters.Add("@RecoveryKey", MySqlDbType.VarChar, 512).Value = RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
             }
@@ -283,7 +301,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("", conn))
                 {
-                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", MySqlDbType.Int32).Value = ID;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -330,7 +348,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SQLiteCommand cmd = new SQLiteCommand("", conn))
                 {
-                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY ON CONFLICT REPLACE, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512));";
+                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY ON CONFLICT REPLACE, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -344,7 +362,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SQLiteCommand cmd = new SQLiteCommand("", conn))
                 {
-                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     try
                     {
                         dt.Load(cmd.ExecuteReader());
@@ -358,7 +376,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link)
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
@@ -366,13 +384,14 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SQLiteCommand cmd = new SQLiteCommand("", conn))
                 {
-                    cmd.CommandText = $"INSERT INTO T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID, CredentialName, UserID, Password, Link) VALUES (@ID, @CredentialName, @UserID, @Password, @Link); " +
-                                      $"SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"INSERT INTO T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID, CredentialName, UserID, Password, Link, RecoveryKey) VALUES (@ID, @CredentialName, @UserID, @Password, @Link, @RecoveryKey); " +
+                                      $"SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", DbType.Int32).Value = ID;
                     cmd.Parameters.Add("@CredentialName", DbType.String, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", DbType.String, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", DbType.String, 512).Value = Password;
                     cmd.Parameters.Add("@Link", DbType.String, 512).Value = Link;
+                    cmd.Parameters.Add("@RecoveryKey", DbType.String, 512).Value = RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
             }
@@ -387,7 +406,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SQLiteCommand cmd = new SQLiteCommand("", conn))
                 {
-                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", DbType.Int32).Value = ID;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -471,7 +490,7 @@ namespace BoycoT_Password_Vault
                 return new DataTable("PasswordVault");
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link)
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = GetPasswords();
             if (dt.Columns.Count == 0)
@@ -481,6 +500,7 @@ namespace BoycoT_Password_Vault
                 dt.Columns.Add("UserID", typeof(string));
                 dt.Columns.Add("Password", typeof(string));
                 dt.Columns.Add("Link", typeof(string));
+                dt.Columns.Add("RecoveryKey", typeof(string));
             }
             if (dt.Rows.Count > 0 && dt.AsEnumerable().Any(row => int.Parse(row["ID"].ToString()) == ID))
             {
@@ -489,6 +509,7 @@ namespace BoycoT_Password_Vault
                 row["UserID"] = UserID;
                 row["Password"] = Password;
                 row["Link"] = Link;
+                row["RecoveryKey"] = RecoveryKey;
             }
             else
             {
@@ -498,6 +519,7 @@ namespace BoycoT_Password_Vault
                 row["UserID"] = UserID;
                 row["Password"] = Password;
                 row["Link"] = Link;
+                row["RecoveryKey"] = RecoveryKey;
                 dt.Rows.Add(row);
             }
             dt.AcceptChanges();

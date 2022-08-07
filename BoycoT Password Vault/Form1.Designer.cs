@@ -38,13 +38,15 @@
             this.btnShowUserID = new System.Windows.Forms.ToolStripButton();
             this.btnShowPassword = new System.Windows.Forms.ToolStripButton();
             this.btnShowLink = new System.Windows.Forms.ToolStripButton();
+            this.btnShowRecoveryKey = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUserID = new System.Windows.Forms.DataGridViewButtonColumn();
             this.colPassword = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.colRecoveryKey = new System.Windows.Forms.DataGridViewButtonColumn();
             this.colLink = new System.Windows.Forms.DataGridViewLinkColumn();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -60,7 +62,8 @@
             this.btnEdit,
             this.btnShowUserID,
             this.btnShowPassword,
-            this.btnShowLink});
+            this.btnShowLink,
+            this.btnShowRecoveryKey});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 25);
@@ -145,6 +148,17 @@
             this.btnShowLink.ToolTipText = "Hide/Unhide Link";
             this.btnShowLink.CheckedChanged += new System.EventHandler(this.btnsHideUnhide_CheckedChanged);
             // 
+            // btnShowRecoveryKey
+            // 
+            this.btnShowRecoveryKey.CheckOnClick = true;
+            this.btnShowRecoveryKey.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnShowRecoveryKey.Image = global::BoycoT_Password_Vault.Properties.Resources.security_icon;
+            this.btnShowRecoveryKey.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnShowRecoveryKey.Name = "btnShowRecoveryKey";
+            this.btnShowRecoveryKey.Size = new System.Drawing.Size(23, 22);
+            this.btnShowRecoveryKey.ToolTipText = "Hide/Unhide Recovery Key";
+            this.btnShowRecoveryKey.CheckedChanged += new System.EventHandler(this.btnsHideUnhide_CheckedChanged);
+            // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
@@ -159,6 +173,7 @@
             this.colName,
             this.colUserID,
             this.colPassword,
+            this.colRecoveryKey,
             this.colLink});
             this.dataGridView1.Location = new System.Drawing.Point(0, 28);
             this.dataGridView1.Name = "dataGridView1";
@@ -171,6 +186,14 @@
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             this.dataGridView1.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.dataGridView1_CellToolTipTextNeeded);
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(800, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // colID
             // 
@@ -198,7 +221,6 @@
             this.colUserID.Name = "colUserID";
             this.colUserID.ReadOnly = true;
             this.colUserID.Text = "";
-            this.colUserID.ToolTipText = "Copy UserID to Clipboard";
             this.colUserID.Width = 46;
             // 
             // colPassword
@@ -210,6 +232,16 @@
             this.colPassword.ReadOnly = true;
             this.colPassword.Width = 59;
             // 
+            // colRecoveryKey
+            // 
+            this.colRecoveryKey.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colRecoveryKey.DataPropertyName = "RecoveryKey";
+            this.colRecoveryKey.HeaderText = "RecoveryKey";
+            this.colRecoveryKey.Name = "colRecoveryKey";
+            this.colRecoveryKey.ReadOnly = true;
+            this.colRecoveryKey.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.colRecoveryKey.Width = 77;
+            // 
             // colLink
             // 
             this.colLink.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
@@ -219,14 +251,6 @@
             this.colLink.ReadOnly = true;
             this.colLink.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.colLink.Width = 33;
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(800, 22);
-            this.statusStrip1.TabIndex = 2;
-            this.statusStrip1.Text = "statusStrip1";
             // 
             // Form1
             // 
@@ -261,10 +285,12 @@
         private System.Windows.Forms.ToolStripButton btnShowUserID;
         private System.Windows.Forms.ToolStripButton btnShowPassword;
         private System.Windows.Forms.ToolStripButton btnShowLink;
+        private System.Windows.Forms.ToolStripButton btnShowRecoveryKey;
         private System.Windows.Forms.DataGridViewTextBoxColumn colID;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
         private System.Windows.Forms.DataGridViewButtonColumn colUserID;
         private System.Windows.Forms.DataGridViewButtonColumn colPassword;
+        private System.Windows.Forms.DataGridViewButtonColumn colRecoveryKey;
         private System.Windows.Forms.DataGridViewLinkColumn colLink;
     }
 }
