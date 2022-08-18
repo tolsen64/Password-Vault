@@ -41,13 +41,13 @@
             this.txtRecoveryKey = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.chkUpperCase = new System.Windows.Forms.CheckBox();
-            this.chkLowerCase = new System.Windows.Forms.CheckBox();
-            this.chkNumbers = new System.Windows.Forms.CheckBox();
-            this.chkSymbols = new System.Windows.Forms.CheckBox();
-            this.btnCreatePassword = new System.Windows.Forms.Button();
-            this.numPwdLength = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
+            this.numPwdLength = new System.Windows.Forms.NumericUpDown();
+            this.btnCreatePassword = new System.Windows.Forms.Button();
+            this.chkSymbols = new System.Windows.Forms.CheckBox();
+            this.chkNumbers = new System.Windows.Forms.CheckBox();
+            this.chkLowerCase = new System.Windows.Forms.CheckBox();
+            this.chkUpperCase = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPwdLength)).BeginInit();
             this.SuspendLayout();
@@ -123,7 +123,7 @@
             // 
             // txtLink
             // 
-            this.txtLink.Location = new System.Drawing.Point(110, 84);
+            this.txtLink.Location = new System.Drawing.Point(110, 113);
             this.txtLink.Name = "txtLink";
             this.txtLink.Size = new System.Drawing.Size(351, 20);
             this.txtLink.TabIndex = 4;
@@ -131,7 +131,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(74, 87);
+            this.label4.Location = new System.Drawing.Point(74, 116);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(30, 13);
             this.label4.TabIndex = 9;
@@ -139,7 +139,7 @@
             // 
             // txtRecoveryKey
             // 
-            this.txtRecoveryKey.Location = new System.Drawing.Point(110, 110);
+            this.txtRecoveryKey.Location = new System.Drawing.Point(110, 84);
             this.txtRecoveryKey.Name = "txtRecoveryKey";
             this.txtRecoveryKey.Size = new System.Drawing.Size(351, 20);
             this.txtRecoveryKey.TabIndex = 10;
@@ -147,9 +147,9 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 113);
+            this.label5.Location = new System.Drawing.Point(27, 87);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(92, 13);
+            this.label5.Size = new System.Drawing.Size(77, 13);
             this.label5.TabIndex = 11;
             this.label5.Text = "Recovery Key:";
             // 
@@ -169,45 +169,21 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Create Password";
             // 
-            // chkUpperCase
+            // label6
             // 
-            this.chkUpperCase.AutoSize = true;
-            this.chkUpperCase.Location = new System.Drawing.Point(6, 19);
-            this.chkUpperCase.Name = "chkUpperCase";
-            this.chkUpperCase.Size = new System.Drawing.Size(79, 17);
-            this.chkUpperCase.TabIndex = 0;
-            this.chkUpperCase.Text = "UpperCase";
-            this.chkUpperCase.UseVisualStyleBackColor = true;
+            this.label6.Location = new System.Drawing.Point(162, 16);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(61, 14);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "PwdLen";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // chkLowerCase
+            // numPwdLength
             // 
-            this.chkLowerCase.AutoSize = true;
-            this.chkLowerCase.Location = new System.Drawing.Point(6, 36);
-            this.chkLowerCase.Name = "chkLowerCase";
-            this.chkLowerCase.Size = new System.Drawing.Size(79, 17);
-            this.chkLowerCase.TabIndex = 1;
-            this.chkLowerCase.Text = "LowerCase";
-            this.chkLowerCase.UseVisualStyleBackColor = true;
-            // 
-            // chkNumbers
-            // 
-            this.chkNumbers.AutoSize = true;
-            this.chkNumbers.Location = new System.Drawing.Point(91, 19);
-            this.chkNumbers.Name = "chkNumbers";
-            this.chkNumbers.Size = new System.Drawing.Size(68, 17);
-            this.chkNumbers.TabIndex = 2;
-            this.chkNumbers.Text = "Numbers";
-            this.chkNumbers.UseVisualStyleBackColor = true;
-            // 
-            // chkSymbols
-            // 
-            this.chkSymbols.AutoSize = true;
-            this.chkSymbols.Location = new System.Drawing.Point(91, 36);
-            this.chkSymbols.Name = "chkSymbols";
-            this.chkSymbols.Size = new System.Drawing.Size(65, 17);
-            this.chkSymbols.TabIndex = 3;
-            this.chkSymbols.Text = "Symbols";
-            this.chkSymbols.UseVisualStyleBackColor = true;
+            this.numPwdLength.Location = new System.Drawing.Point(162, 33);
+            this.numPwdLength.Name = "numPwdLength";
+            this.numPwdLength.Size = new System.Drawing.Size(61, 20);
+            this.numPwdLength.TabIndex = 5;
             // 
             // btnCreatePassword
             // 
@@ -219,21 +195,45 @@
             this.btnCreatePassword.UseVisualStyleBackColor = true;
             this.btnCreatePassword.Click += new System.EventHandler(this.btnCreatePassword_Click);
             // 
-            // numPwdLength
+            // chkSymbols
             // 
-            this.numPwdLength.Location = new System.Drawing.Point(162, 33);
-            this.numPwdLength.Name = "numPwdLength";
-            this.numPwdLength.Size = new System.Drawing.Size(61, 20);
-            this.numPwdLength.TabIndex = 5;
+            this.chkSymbols.AutoSize = true;
+            this.chkSymbols.Location = new System.Drawing.Point(91, 36);
+            this.chkSymbols.Name = "chkSymbols";
+            this.chkSymbols.Size = new System.Drawing.Size(65, 17);
+            this.chkSymbols.TabIndex = 3;
+            this.chkSymbols.Text = "Symbols";
+            this.chkSymbols.UseVisualStyleBackColor = true;
             // 
-            // label6
+            // chkNumbers
             // 
-            this.label6.Location = new System.Drawing.Point(162, 16);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(61, 14);
-            this.label6.TabIndex = 6;
-            this.label6.Text = "PwdLen";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkNumbers.AutoSize = true;
+            this.chkNumbers.Location = new System.Drawing.Point(91, 19);
+            this.chkNumbers.Name = "chkNumbers";
+            this.chkNumbers.Size = new System.Drawing.Size(68, 17);
+            this.chkNumbers.TabIndex = 2;
+            this.chkNumbers.Text = "Numbers";
+            this.chkNumbers.UseVisualStyleBackColor = true;
+            // 
+            // chkLowerCase
+            // 
+            this.chkLowerCase.AutoSize = true;
+            this.chkLowerCase.Location = new System.Drawing.Point(6, 36);
+            this.chkLowerCase.Name = "chkLowerCase";
+            this.chkLowerCase.Size = new System.Drawing.Size(79, 17);
+            this.chkLowerCase.TabIndex = 1;
+            this.chkLowerCase.Text = "LowerCase";
+            this.chkLowerCase.UseVisualStyleBackColor = true;
+            // 
+            // chkUpperCase
+            // 
+            this.chkUpperCase.AutoSize = true;
+            this.chkUpperCase.Location = new System.Drawing.Point(6, 19);
+            this.chkUpperCase.Name = "chkUpperCase";
+            this.chkUpperCase.Size = new System.Drawing.Size(79, 17);
+            this.chkUpperCase.TabIndex = 0;
+            this.chkUpperCase.Text = "UpperCase";
+            this.chkUpperCase.UseVisualStyleBackColor = true;
             // 
             // FormCredential
             // 

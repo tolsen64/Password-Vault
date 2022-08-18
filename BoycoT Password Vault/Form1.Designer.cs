@@ -40,13 +40,13 @@
             this.btnShowLink = new System.Windows.Forms.ToolStripButton();
             this.btnShowRecoveryKey = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.colID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUserID = new System.Windows.Forms.DataGridViewButtonColumn();
             this.colPassword = new System.Windows.Forms.DataGridViewButtonColumn();
             this.colRecoveryKey = new System.Windows.Forms.DataGridViewButtonColumn();
             this.colLink = new System.Windows.Forms.DataGridViewLinkColumn();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -62,8 +62,8 @@
             this.btnEdit,
             this.btnShowUserID,
             this.btnShowPassword,
-            this.btnShowLink,
-            this.btnShowRecoveryKey});
+            this.btnShowRecoveryKey,
+            this.btnShowLink});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(800, 25);
@@ -187,14 +187,6 @@
             this.dataGridView1.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.dataGridView1_CellToolTipTextNeeded);
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(800, 22);
-            this.statusStrip1.TabIndex = 2;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
             // colID
             // 
             this.colID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
@@ -251,6 +243,14 @@
             this.colLink.ReadOnly = true;
             this.colLink.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.colLink.Width = 33;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 428);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(800, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // Form1
             // 
