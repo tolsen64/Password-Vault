@@ -7,4 +7,4 @@ My attempt to make a secure password keeper for myself.
 
 ![](https://i.imgur.com/MXdKniz.png)
 
-![Hit Counter](http://boycot.no-ip.com/hc/?id=GitHub.Password-Vault "My Stupid Hit Counter!")
+![Hit Counter](http://tolsen64.com:8081/api/hc/GitHub.Password-Vault "My Stupid Hit Counter!")
