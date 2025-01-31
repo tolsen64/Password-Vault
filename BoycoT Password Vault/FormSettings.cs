@@ -47,8 +47,7 @@ namespace BoycoT_Password_Vault
 
         private void btnTestDbConnection_Click(object sender, EventArgs e)
         {
-            AbstractDatabase tmpDb;
-            tmpDb = null;
+            IDatabase tmpDb = null;
             if (rdoJson.Checked) tmpDb = new JsonDatabase();
             if (rdoMSSQL.Checked) tmpDb = new SqlServerDatabase();
             if (rdoMySQL.Checked) tmpDb = new MySqlDatabase();

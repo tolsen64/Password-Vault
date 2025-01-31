@@ -43,7 +43,7 @@ namespace BoycoT_Password_Vault
             }
 
             settings = JsonConvert.DeserializeObject<SettingsRoot>(File.ReadAllText(Shared.SettingsFile));
-            AbstractDatabase db = Shared.GetDatabase();
+            IDatabase db = Shared.GetDatabase();
             Debug.WriteLine(db.ConnectionString);
             if (db.ConnectionString != "" && db.TestConnection())
             {

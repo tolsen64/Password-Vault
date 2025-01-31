@@ -7,9 +7,9 @@ namespace BoycoT_Password_Vault
         internal static string SettingsFile;
         internal static string DbUserTableName;
 
-        internal static  AbstractDatabase GetDatabase()
+        internal static IDatabase GetDatabase() // Change return type to IDatabase
         {
-            AbstractDatabase db = null;
+            IDatabase db = null; // Change variable type to IDatabase
             switch (settings.dbType)
             {
                 case 0:

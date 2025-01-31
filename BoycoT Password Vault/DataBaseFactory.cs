@@ -1,5 +1,4 @@
-﻿//using MySql.Data.MySqlClient;
-using MySqlConnector;
+﻿using MySqlConnector;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
@@ -13,27 +12,25 @@ using System.Linq;
 using System.Diagnostics;
 using System;
 using LiteDB;
-using FaunaDB.Client;
-using FaunaDB.Query;
-using FaunaDB.Types;
 
 namespace BoycoT_Password_Vault
 {
-    internal abstract class AbstractDatabase
+
+    internal interface IDatabase
     {
-        internal abstract string ConnectionString { get; set; }
-        internal abstract bool TestConnection();
-        internal abstract void CreateTable();
-        internal abstract DataTable GetPasswords();
-        internal abstract DataTable DeletePassword(int ID);
-        internal abstract DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey);
+        string ConnectionString { get; set; }
+        bool TestConnection();
+        void CreateTable();
+        DataTable GetPasswords();
+        DataTable DeletePassword(int ID);
+        DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey);
     }
 
-    internal class JsonDatabase : AbstractDatabase
+    internal class JsonDatabase : IDatabase
     {
         private string _connStr = "";
 
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get
             {
@@ -43,7 +40,7 @@ namespace BoycoT_Password_Vault
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             if (_connStr == "")
                 throw new System.Exception("Connection String is empty.");
@@ -51,7 +48,7 @@ namespace BoycoT_Password_Vault
                 File.WriteAllText(ConnectionString, "");
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             DataTable dt = GetPasswords();
 
@@ -64,7 +61,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             DataTable dt;
             if (File.Exists(ConnectionString) && new FileInfo(ConnectionString).Length > 0)
@@ -75,7 +72,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = GetPasswords();
             if (dt.Columns.Count == 0)
@@ -112,7 +109,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             if (_connStr == "")
             {
@@ -128,17 +125,16 @@ namespace BoycoT_Password_Vault
             return true;
         }
     }
-
-    internal class SqlServerDatabase : AbstractDatabase
+        internal class SqlServerDatabase : IDatabase
     {
         private string _connStr;
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
@@ -151,7 +147,7 @@ namespace BoycoT_Password_Vault
             }
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnectionString))
@@ -166,7 +162,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnectionString))
@@ -192,7 +188,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             DataTable dt = new DataTable();
             using (SqlConnection conn = new SqlConnection(ConnectionString))
@@ -200,7 +196,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand("", conn))
                 {
-                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
+                    cmd.CommandText = $"DELETE FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault WHERE ID = @ID ;SELECT ID, CredentialName, UserID, Password, Link, RecoveryKey FROM T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault ORDER BY CredentialName;";
                     cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -208,7 +204,7 @@ namespace BoycoT_Password_Vault
             return dt;
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             try
             {
@@ -226,16 +222,16 @@ namespace BoycoT_Password_Vault
         }
     }
 
-    internal class MySqlDatabase : AbstractDatabase
+    internal class MySqlDatabase : IDatabase
     {
         private string _connStr;
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             using (MySqlConnection conn = new MySqlConnection(ConnectionString))
             {
@@ -261,7 +257,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             DataTable dt = new DataTable();
             using (MySqlConnection conn = new MySqlConnection(ConnectionString))
@@ -276,7 +272,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (MySqlConnection conn = new MySqlConnection(ConnectionString))
@@ -300,7 +296,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             DataTable dt = new DataTable();
             using (MySqlConnection conn = new MySqlConnection(ConnectionString))
@@ -316,7 +312,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             try
             {
@@ -344,10 +340,10 @@ DROP PROCEDURE temp_add_column;
         }
     }
 
-    internal class SQLiteDatabase : AbstractDatabase
+    internal class SQLiteDatabase : IDatabase
     {
         private string _connStr;
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get
             {
@@ -357,7 +353,7 @@ DROP PROCEDURE temp_add_column;
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
             {
@@ -371,7 +367,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             DataTable dt = new DataTable();
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
@@ -393,7 +389,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = new DataTable();
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
@@ -415,7 +411,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             DataTable dt = new DataTable();
             using (SQLiteConnection conn = new SQLiteConnection(ConnectionString))
@@ -431,7 +427,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             try
             {
@@ -453,11 +449,11 @@ DROP PROCEDURE temp_add_column;
         }
     }
 
-    internal class XMLDatabase : AbstractDatabase
+    internal class XMLDatabase : IDatabase
     {
         private string _connStr = "";
 
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get
             {
@@ -467,7 +463,7 @@ DROP PROCEDURE temp_add_column;
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             if (_connStr == "")
                 throw new System.Exception("Connection String is empty.");
@@ -475,7 +471,7 @@ DROP PROCEDURE temp_add_column;
                 File.WriteAllText(ConnectionString, "");
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             DataTable dt = GetPasswords();
 
@@ -488,7 +484,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             if (File.Exists(ConnectionString) && new FileInfo(ConnectionString).Length > 0)
             {
@@ -507,7 +503,7 @@ DROP PROCEDURE temp_add_column;
                 return new DataTable("PasswordVault");
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             DataTable dt = GetPasswords();
             if (dt.Columns.Count == 0)
@@ -544,7 +540,7 @@ DROP PROCEDURE temp_add_column;
             return dt;
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             if (_connStr == "")
             {
@@ -561,17 +557,17 @@ DROP PROCEDURE temp_add_column;
         }
     }
 
-    internal class LiteDbDatabase : AbstractDatabase
+    internal class LiteDbDatabase : IDatabase
     {
         private string _connStr;
 
-        internal override string ConnectionString
+        public string ConnectionString
         {
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
             set => _connStr = value;
         }
 
-        internal override void CreateTable()
+        public void CreateTable()
         {
             using (var db = new LiteDatabase(ConnectionString))
             {
@@ -580,7 +576,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override DataTable GetPasswords()
+        public DataTable GetPasswords()
         {
             using (var db = new LiteDatabase(ConnectionString))
             {
@@ -604,7 +600,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        public DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
         {
             using (var db = new LiteDatabase(ConnectionString))
             {
@@ -640,7 +636,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override DataTable DeletePassword(int ID)
+        public DataTable DeletePassword(int ID)
         {
             using (var db = new LiteDatabase(ConnectionString))
             {
@@ -666,7 +662,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        internal override bool TestConnection()
+        public bool TestConnection()
         {
             try
             {
@@ -683,7 +679,7 @@ DROP PROCEDURE temp_add_column;
             }
         }
 
-        private class PasswordEntry
+        private sealed class PasswordEntry
         {
             public int ID { get; set; }
             public string CredentialName { get; set; }
