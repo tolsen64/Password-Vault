@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -29,7 +30,7 @@ namespace BoycoT_Password_Vault
         internal static DataTable dtCredentials = new DataTable();
 
         // LoadSettings is called from Program.cs
-        internal static bool LoadSettings()
+        internal static bool LoadSettings(bool mergeSettings = false)
         {
             if (!File.Exists(Shared.SettingsFile))
             {
@@ -43,6 +44,7 @@ namespace BoycoT_Password_Vault
 
             settings = JsonConvert.DeserializeObject<SettingsRoot>(File.ReadAllText(Shared.SettingsFile));
             AbstractDatabase db = Shared.GetDatabase();
+            Debug.WriteLine(db.ConnectionString);
             if (db.ConnectionString != "" && db.TestConnection())
             {
                 db.CreateTable();

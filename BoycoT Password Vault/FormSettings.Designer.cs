@@ -58,6 +58,7 @@
             this.chkUsePIN = new System.Windows.Forms.CheckBox();
             this.lblPIN = new System.Windows.Forms.Label();
             this.txtPIN = new System.Windows.Forms.TextBox();
+            this.rdoLiteDB = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPort)).BeginInit();
             this.panel1.SuspendLayout();
@@ -89,6 +90,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.rdoLiteDB);
             this.groupBox1.Controls.Add(this.rdoXML);
             this.groupBox1.Controls.Add(this.chkShowPasswordDB);
             this.groupBox1.Controls.Add(this.label9);
@@ -124,6 +126,7 @@
             this.rdoXML.TabStop = true;
             this.rdoXML.Text = "XML file";
             this.rdoXML.UseVisualStyleBackColor = true;
+            this.rdoXML.CheckedChanged += new System.EventHandler(this.rdoDbType_CheckedChanged);
             // 
             // chkShowPasswordDB
             // 
@@ -139,7 +142,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(346, 21);
+            this.label9.Location = new System.Drawing.Point(404, 21);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(29, 13);
             this.label9.TabIndex = 12;
@@ -147,7 +150,7 @@
             // 
             // numPort
             // 
-            this.numPort.Location = new System.Drawing.Point(383, 19);
+            this.numPort.Location = new System.Drawing.Point(434, 18);
             this.numPort.Maximum = new decimal(new int[] {
             65536,
             0,
@@ -161,7 +164,7 @@
             // 
             this.panel1.Controls.Add(this.rdoUseCredientials);
             this.panel1.Controls.Add(this.rdoIntegratedSecurity);
-            this.panel1.Location = new System.Drawing.Point(445, 15);
+            this.panel1.Location = new System.Drawing.Point(498, 13);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(272, 27);
             this.panel1.TabIndex = 22;
@@ -381,6 +384,18 @@
             this.txtPIN.UseSystemPasswordChar = true;
             this.txtPIN.Visible = false;
             // 
+            // rdoLiteDB
+            // 
+            this.rdoLiteDB.AutoSize = true;
+            this.rdoLiteDB.Location = new System.Drawing.Point(346, 19);
+            this.rdoLiteDB.Name = "rdoLiteDB";
+            this.rdoLiteDB.Size = new System.Drawing.Size(57, 17);
+            this.rdoLiteDB.TabIndex = 24;
+            this.rdoLiteDB.TabStop = true;
+            this.rdoLiteDB.Text = "LiteDB";
+            this.rdoLiteDB.UseVisualStyleBackColor = true;
+            this.rdoLiteDB.CheckedChanged += new System.EventHandler(this.rdoDbType_CheckedChanged);
+            // 
             // FormSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -446,5 +461,6 @@
         private System.Windows.Forms.CheckBox chkUsePIN;
         private System.Windows.Forms.Label lblPIN;
         private System.Windows.Forms.TextBox txtPIN;
+        private System.Windows.Forms.RadioButton rdoLiteDB;
     }
 }

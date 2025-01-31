@@ -32,6 +32,10 @@ namespace BoycoT_Password_Vault
                     db = new XMLDatabase();
                     db.ConnectionString = settings.dbServer;
                     break;
+                case 5:
+                    db = new LiteDbDatabase();
+                    db.ConnectionString = settings.dbConnStr;
+                    break;
             }
             return db;
         }

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BoycoT Password Vault")]
-[assembly: AssemblyCopyright("Copyright © BoycoT  2019 - 2020")]
+[assembly: AssemblyCopyright("Copyright © BoycoT  2019 - 2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

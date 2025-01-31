@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿//using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
@@ -10,6 +11,11 @@ using Newtonsoft.Json;
 using System.Reflection;
 using System.Linq;
 using System.Diagnostics;
+using System;
+using LiteDB;
+using FaunaDB.Client;
+using FaunaDB.Query;
+using FaunaDB.Types;
 
 namespace BoycoT_Password_Vault
 {
@@ -29,7 +35,8 @@ namespace BoycoT_Password_Vault
 
         internal override string ConnectionString
         {
-            get {
+            get
+            {
                 FileInfo fi = new FileInfo(_connStr.DecryptBase64StringToText().ToUnsecureString());
                 return $"{fi.Name.Replace(fi.Extension, "")}_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}{fi.Extension}";
             }
@@ -125,9 +132,10 @@ namespace BoycoT_Password_Vault
     internal class SqlServerDatabase : AbstractDatabase
     {
         private string _connStr;
-        internal override string ConnectionString {
+        internal override string ConnectionString
+        {
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
-            set => _connStr = value; 
+            set => _connStr = value;
         }
 
         internal override void CreateTable()
@@ -137,7 +145,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand("", conn))
                 {
-                    cmd.CommandText = $"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault' AND xtype='U') CREATE TABLE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
+                    cmd.CommandText = $"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault' AND xtype='U') CREATE TABLE T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(MAX), RecoveryKey varchar(512));";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -176,7 +184,7 @@ namespace BoycoT_Password_Vault
                     cmd.Parameters.Add("@CredentialName", SqlDbType.VarChar, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", SqlDbType.VarChar, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", SqlDbType.VarChar, 512).Value = Password;
-                    cmd.Parameters.Add("@Link", SqlDbType.VarChar, 512).Value = Link == null || Link == "" ? "" : Link;
+                    cmd.Parameters.Add("@Link", SqlDbType.VarChar, -1).Value = Link == null || Link == "" ? "" : Link;
                     cmd.Parameters.Add("@RecoveryKey", SqlDbType.VarChar, 512).Value = RecoveryKey == null || RecoveryKey == "" ? "" : RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -223,7 +231,6 @@ namespace BoycoT_Password_Vault
         private string _connStr;
         internal override string ConnectionString
         {
-            //get => "server=192.168.1.202;database=tolsen64;uid=tolsen64;pwd=abcDEF123$%^";
             get => _connStr.DecryptBase64StringToText().ToUnsecureString();
             set => _connStr = value;
         }
@@ -235,7 +242,7 @@ namespace BoycoT_Password_Vault
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("", conn))
                 {
-                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
+                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link TEXT, RecoveryKey varchar(512));";
                     cmd.ExecuteNonQuery();
 
                     cmd.CommandText = $@"
@@ -285,7 +292,7 @@ DROP PROCEDURE temp_add_column;
                     cmd.Parameters.Add("@CredentialName", MySqlDbType.VarChar, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", MySqlDbType.VarChar, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", MySqlDbType.VarChar, 512).Value = Password;
-                    cmd.Parameters.Add("@Link", MySqlDbType.VarChar, 512).Value = Link;
+                    cmd.Parameters.Add("@Link", MySqlDbType.Text).Value = Link;
                     cmd.Parameters.Add("@RecoveryKey", MySqlDbType.VarChar, 512).Value = RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -324,6 +331,16 @@ DROP PROCEDURE temp_add_column;
                 MessageBox.Show($"Unable to connect to MySql Database. Error: {ex.Message}");
                 return false;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to connect to MySql Database. Error: {ex.Message}");
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                    MessageBox.Show($"Unable to connect to MySql Database. Error: {ex.Message}");
+                }
+                return false;
+            }
         }
     }
 
@@ -348,7 +365,7 @@ DROP PROCEDURE temp_add_column;
                 conn.Open();
                 using (SQLiteCommand cmd = new SQLiteCommand("", conn))
                 {
-                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY ON CONFLICT REPLACE, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link varchar(512), RecoveryKey varchar(512));";
+                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS T_{Shared.DbUserTableName.DecryptBase64StringToText().ToUnsecureString()}_PasswordVault (ID int NOT NULL PRIMARY KEY ON CONFLICT REPLACE, CredentialName varchar(512), UserID varchar(512), Password varchar(512), Link TEXT, RecoveryKey varchar(512));";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -390,7 +407,7 @@ DROP PROCEDURE temp_add_column;
                     cmd.Parameters.Add("@CredentialName", DbType.String, 512).Value = CredentialName;
                     cmd.Parameters.Add("@UserID", DbType.String, 512).Value = UserID;
                     cmd.Parameters.Add("@Password", DbType.String, 512).Value = Password;
-                    cmd.Parameters.Add("@Link", DbType.String, 512).Value = Link;
+                    cmd.Parameters.Add("@Link", DbType.String).Value = Link;
                     cmd.Parameters.Add("@RecoveryKey", DbType.String, 512).Value = RecoveryKey;
                     dt.Load(cmd.ExecuteReader());
                 }
@@ -543,4 +560,140 @@ DROP PROCEDURE temp_add_column;
             return true;
         }
     }
+
+    internal class LiteDbDatabase : AbstractDatabase
+    {
+        private string _connStr;
+
+        internal override string ConnectionString
+        {
+            get => _connStr.DecryptBase64StringToText().ToUnsecureString();
+            set => _connStr = value;
+        }
+
+        internal override void CreateTable()
+        {
+            using (var db = new LiteDatabase(ConnectionString))
+            {
+                var col = db.GetCollection<PasswordEntry>("PasswordVault");
+                col.EnsureIndex(x => x.ID, true);
+            }
+        }
+
+        internal override DataTable GetPasswords()
+        {
+            using (var db = new LiteDatabase(ConnectionString))
+            {
+                var col = db.GetCollection<PasswordEntry>("PasswordVault");
+                var entries = col.FindAll().ToList();
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ID", typeof(int));
+                dt.Columns.Add("CredentialName", typeof(string));
+                dt.Columns.Add("UserID", typeof(string));
+                dt.Columns.Add("Password", typeof(string));
+                dt.Columns.Add("Link", typeof(string));
+                dt.Columns.Add("RecoveryKey", typeof(string));
+
+                foreach (var entry in entries)
+                {
+                    dt.Rows.Add(entry.ID, entry.CredentialName, entry.UserID, entry.Password, entry.Link, entry.RecoveryKey);
+                }
+
+                return dt;
+            }
+        }
+
+        internal override DataTable MergePassword(int ID, string CredentialName, string UserID, string Password, string Link, string RecoveryKey)
+        {
+            using (var db = new LiteDatabase(ConnectionString))
+            {
+                var col = db.GetCollection<PasswordEntry>("PasswordVault");
+                var entry = new PasswordEntry
+                {
+                    ID = ID,
+                    CredentialName = CredentialName,
+                    UserID = UserID,
+                    Password = Password,
+                    Link = Link,
+                    RecoveryKey = RecoveryKey
+                };
+
+                col.Upsert(entry);
+
+                var entries = col.FindAll().ToList();
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ID", typeof(int));
+                dt.Columns.Add("CredentialName", typeof(string));
+                dt.Columns.Add("UserID", typeof(string));
+                dt.Columns.Add("Password", typeof(string));
+                dt.Columns.Add("Link", typeof(string));
+                dt.Columns.Add("RecoveryKey", typeof(string));
+
+                foreach (var e in entries)
+                {
+                    dt.Rows.Add(e.ID, e.CredentialName, e.UserID, e.Password, e.Link, e.RecoveryKey);
+                }
+
+                return dt;
+            }
+        }
+
+        internal override DataTable DeletePassword(int ID)
+        {
+            using (var db = new LiteDatabase(ConnectionString))
+            {
+                var col = db.GetCollection<PasswordEntry>("PasswordVault");
+                col.Delete(ID);
+
+                var entries = col.FindAll().ToList();
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ID", typeof(int));
+                dt.Columns.Add("CredentialName", typeof(string));
+                dt.Columns.Add("UserID", typeof(string));
+                dt.Columns.Add("Password", typeof(string));
+                dt.Columns.Add("Link", typeof(string));
+                dt.Columns.Add("RecoveryKey", typeof(string));
+
+                foreach (var entry in entries)
+                {
+                    dt.Rows.Add(entry.ID, entry.CredentialName, entry.UserID, entry.Password, entry.Link, entry.RecoveryKey);
+                }
+
+                return dt;
+            }
+        }
+
+        internal override bool TestConnection()
+        {
+            try
+            {
+                using (var db = new LiteDatabase(ConnectionString))
+                {
+                    db.Checkpoint();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to connect to LiteDB. Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        private class PasswordEntry
+        {
+            public int ID { get; set; }
+            public string CredentialName { get; set; }
+            public string UserID { get; set; }
+            public string Password { get; set; }
+            public string Link { get; set; }
+            public string RecoveryKey { get; set; }
+        }
+    }
+
+
+   
 }

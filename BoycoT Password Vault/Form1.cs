@@ -108,10 +108,8 @@ namespace BoycoT_Password_Vault
                         {
                             if (dlg.ShowDialog() == DialogResult.OK)
                             {
-                                if (dlg.MergeSettings) MergeExistingPasswordsIntoNewDatabase();
-
                                 dataGridView1.DataSource = null;
-                                LoadSettings();
+                                LoadSettings(dlg.MergeSettings);
                                 dataGridView1.DataSource = dtCredentials.DefaultView;
                             }
                         }

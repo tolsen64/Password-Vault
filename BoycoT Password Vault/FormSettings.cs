@@ -54,6 +54,7 @@ namespace BoycoT_Password_Vault
             if (rdoMySQL.Checked) tmpDb = new MySqlDatabase();
             if (rdoSQLite.Checked) tmpDb = new SQLiteDatabase();
             if (rdoXML.Checked) tmpDb = new XMLDatabase();
+            if (rdoLiteDB.Checked) tmpDb = new LiteDbDatabase();
 
             tmpDb.ConnectionString = BuildConnectionString().EncryptTextToBase64String();
             if (tmpDb.TestConnection())
@@ -64,7 +65,7 @@ namespace BoycoT_Password_Vault
 
         private SecureString BuildConnectionString()
         {
-            if (rdoJson.Checked || rdoXML.Checked)
+            if (rdoJson.Checked || rdoXML.Checked || rdoLiteDB.Checked)
                 return txtServerFile.Text.ToSecureString();
 
             else if (rdoSQLite.Checked)
@@ -104,9 +105,11 @@ namespace BoycoT_Password_Vault
             else if (rdoMSSQL.Checked)
                 txtServerFile.Text = "(localdb)\\MSSQLLocalDB";
             else if (rdoSQLite.Checked)
-                txtServerFile.Text = "database.db";
+                txtServerFile.Text = "database.sqlite";
             else if (rdoXML.Checked)
                 txtServerFile.Text = $"database.xml";
+            else if (rdoLiteDB.Checked)
+                txtServerFile.Text = $"database.litedb";
         }
 
         private void chkShowCreds_CheckedChanged(object sender, EventArgs e)
@@ -123,6 +126,7 @@ namespace BoycoT_Password_Vault
                 rdoMySQL.Checked = value == 2;
                 rdoSQLite.Checked = value == 3;
                 rdoXML.Checked = value == 4;
+                rdoLiteDB.Checked = value == 5;
             }
             get
             {
@@ -131,6 +135,7 @@ namespace BoycoT_Password_Vault
                 if (rdoMySQL.Checked) return 2;
                 if (rdoSQLite.Checked) return 3;
                 if (rdoXML.Checked) return 4;
+                if (rdoLiteDB.Checked) return 5;
                 return -1;
             }
         }
